@@ -46,6 +46,7 @@ public class PagamentoDTO {
 
     public PagamentoDTO(Pagamento entity) {
         id = entity.getId();
+        valor = entity.getValor();
         nome = entity.getNome();
         numeroDoCartao = entity.getNumeroDoCartao();
         validade = entity.getValidade();
