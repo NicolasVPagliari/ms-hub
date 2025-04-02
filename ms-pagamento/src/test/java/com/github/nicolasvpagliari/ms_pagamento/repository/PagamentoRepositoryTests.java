@@ -4,6 +4,7 @@ import com.github.nicolasvpagliari.ms_pagamento.entity.Pagamento;
 import com.github.nicolasvpagliari.ms_pagamento.tests.Factory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -47,5 +48,19 @@ public class PagamentoRepositoryTests {
         Assertions.assertNotNull(pagamento.getId());
 
         Assertions.assertEquals(countTotalPagamento + 1, pagamento.getId());
+    }
+
+    @Test
+    @DisplayName("dado um id não existente ao chamar findById então deve retornar um Optional não vazio")
+    public void givenAnExistingId_whenCallFindById_thenReturnNonEmptyOptional() {
+        Optional<Pagamento> result = repository.findById(existingId);
+        Assertions.assertTrue(result.isPresent());
+    }
+
+    @Test
+    @DisplayName("dado um id não existente ao chamar findById então deve retornar um Optional vazio")
+    public void givenAnNonExistingId_whenCallFindById_thenReturnEmptyOptional() {
+        Optional<Pagamento> result = repository.findById(nonExistingId);
+        Assertions.assertTrue(result.isEmpty());
     }
 }
