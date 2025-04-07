@@ -39,7 +39,7 @@ public class PagamentoDTO {
     private Status status;
 
     @NotNull(message = "Pedido ID é obrigatório")
-    private Long perdidoId;
+    private Long pedidoId;
 
     @NotNull(message = "Forma de pagamento ID é obrigatório")
     private Long formaDePagamento;
@@ -52,7 +52,7 @@ public class PagamentoDTO {
         validade = entity.getValidade();
         codigoDeSeguranca = entity.getCodigoDeSeguranca();
         status = entity.getStatus();
-        perdidoId = entity.getPedidoId();
+        pedidoId = entity.getPedidoId();
         formaDePagamento = entity.getFormaDePagamentoId();
     }
 }

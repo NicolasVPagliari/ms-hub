@@ -75,7 +75,7 @@ public class PagamentoService {
         entity.setNumeroDoCartao(dto.getNumeroDoCartao());
         entity.setValidade(dto.getValidade());
         entity.setCodigoDeSeguranca(dto.getCodigoDeSeguranca());
-        entity.setPedidoId(dto.getPerdidoId());
+        entity.setPedidoId(dto.getPedidoId());
         entity.setFormaDePagamentoId(dto.getFormaDePagamento());
     }
 
