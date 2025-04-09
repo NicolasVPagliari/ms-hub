@@ -6,6 +6,7 @@ import com.github.nicolasvpagliari.ms_pagamento.service.PagamentoService;
 import com.github.nicolasvpagliari.ms_pagamento.service.exceptions.ResourceNotFoundException;
 import com.github.nicolasvpagliari.ms_pagamento.tests.Factory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -66,30 +67,37 @@ public class PagamentoControllerTest {
         //simulando o comportamento do service - updatePagamento
         Mockito.when(service.updatePagamento(eq(existingId), any())).thenReturn(dto);
         Mockito.when(service.updatePagamento(eq(nonExistingId), any())).thenThrow(ResourceNotFoundException.class);
+
+        //simulando o comportamento do delete
+        //quando id existe
+        Mockito.doNothing().when(service).deletePagamento(existingId);
+        //quando id não existe
+        Mockito.doThrow(ResourceNotFoundException.class).when(service).deletePagamento(nonExistingId);
+
     }
 
-   @Test
-    public void getAllShouldReturnListPagamentoDto() throws Exception{
+    @Test
+    public void getAllShouldReturnListPagamentoDto() throws Exception {
         //chamando a requisição com o método GET - endpoint/ pagamentos
-       ResultActions result = mockMvc.perform(get("/pagamentos").accept(MediaType.APPLICATION_JSON));
+        ResultActions result = mockMvc.perform(get("/pagamentos").accept(MediaType.APPLICATION_JSON));
 
-       result.andExpect(status().isOk());
-   }
+        result.andExpect(status().isOk());
+    }
 
-   @Test
-    public void getByIdShouldReturnDtoWhenIdExists() throws Exception{
+    @Test
+    public void getByIdShouldReturnDtoWhenIdExists() throws Exception {
         ResultActions result = mockMvc.perform(get("/pagamentos/{id}", existingId).accept(MediaType.APPLICATION_JSON));
 
         //assertion
-       result.andExpect(status().isOk());
+        result.andExpect(status().isOk());
 
-       result.andExpect(jsonPath("$.id").exists());
-       result.andExpect(jsonPath("$.valor").exists());
-       result.andExpect(jsonPath("$.status").exists());
-   }
+        result.andExpect(jsonPath("$.id").exists());
+        result.andExpect(jsonPath("$.valor").exists());
+        result.andExpect(jsonPath("$.status").exists());
+    }
 
     @Test
-    public void getByIdShouldThrowResourceNotFoundEceptionWhenIdDoesNotExist() throws Exception{
+    public void getByIdShouldThrowResourceNotFoundEceptionWhenIdDoesNotExist() throws Exception {
         ResultActions result = mockMvc.perform(get("/pagamentos/{id}", nonExistingId).accept(MediaType.APPLICATION_JSON));
 
         //assertion
@@ -97,15 +105,15 @@ public class PagamentoControllerTest {
     }
 
     @Test
-    public void createPagamentoShouldReturnDtoCreated() throws Exception{
+    public void createPagamentoShouldReturnDtoCreated() throws Exception {
         PagamentoDTO newPagamentoDTO = Factory.createNewPagamentoDTO();
 
         String jsonRequestBody = objectMapper.writeValueAsString(newPagamentoDTO);
 
         mockMvc.perform(post("/pagamentos")
-                .content(jsonRequestBody)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+                        .content(jsonRequestBody)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
 
                 .andDo(print())
                 .andExpect(status().isCreated())
@@ -118,13 +126,13 @@ public class PagamentoControllerTest {
     }
 
     @Test
-    public void updatePagamentoShouldReturnPagamentoDTOWhenIdExist() throws Exception{
+    public void updatePagamentoShouldReturnPagamentoDTOWhenIdExist() throws Exception {
         String jsonRequestBody = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(put("/pagamentos/{id}", existingId)
-                .content(jsonRequestBody)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+                        .content(jsonRequestBody)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
 
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -136,13 +144,31 @@ public class PagamentoControllerTest {
     }
 
     @Test
-    public void updatePagamentoShouldReturnResourceNotFoundExceptionWhenIdDoesNotExist() throws Exception{
+    public void updatePagamentoShouldReturnResourceNotFoundExceptionWhenIdDoesNotExist() throws Exception {
         String jsonRequestBody = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(put("/pagamentos/{id}", nonExistingId)
-                .content(jsonRequestBody)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+                        .content(jsonRequestBody)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("deletePagamento deverá não fazer nada quando id existe")
+    public void deletePagamentoShouldDoNothingWhenIdExist() throws Exception {
+        mockMvc.perform(delete("/pagamentos/{id}", existingId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("deletePagamento deverá lançar uma ResourceNotFoundException quando id não existe")
+    public void deletePagamentoShouldThrowResourceNotFoudnExceptionWhenIdDoesNotExist() throws Exception {
+        mockMvc.perform(delete("/pagamentos/{id}", nonExistingId)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
