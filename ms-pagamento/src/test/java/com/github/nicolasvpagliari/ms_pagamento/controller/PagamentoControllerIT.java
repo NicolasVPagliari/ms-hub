@@ -116,4 +116,18 @@ public class PagamentoControllerIT {
                 .andExpect(jsonPath("$.nome").isEmpty())
                 .andExpect(jsonPath("$.validade").isEmpty());
     }
+
+    @Test
+    public void createShouldThrowsExceptionWhenInvalidData() throws Exception{
+        pagamentoDTO = Factory.createNewPagamentoDtoWithInvalidData();
+
+        String jsonBody = objectMapper.writeValueAsString(pagamentoDTO);
+        mockMvc.perform(post("/pagamentos")
+                        .content(jsonBody)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is4xxClientError())
+                .andExpect(status().isUnprocessableEntity());
+    }
 }
