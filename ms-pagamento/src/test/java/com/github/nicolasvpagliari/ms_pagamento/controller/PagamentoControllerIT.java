@@ -14,8 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -118,7 +117,7 @@ public class PagamentoControllerIT {
     }
 
     @Test
-    public void createShouldThrowsExceptionWhenInvalidData() throws Exception{
+    public void createShouldThrowsExceptionWhenInvalidData() throws Exception {
         pagamentoDTO = Factory.createNewPagamentoDtoWithInvalidData();
 
         String jsonBody = objectMapper.writeValueAsString(pagamentoDTO);
@@ -129,5 +128,31 @@ public class PagamentoControllerIT {
                 .andDo(print())
                 .andExpect(status().is4xxClientError())
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void updatePagamentoShouldUpdateAndReturnPagamentoDtoWhenIdExists() throws Exception {
+        String jsonBody = objectMapper.writeValueAsString(pagamentoDTO);
+        mockMvc.perform(put("/pagamentos/{id}", existingId)
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("valor").exists())
+                .andExpect(jsonPath("valor").value(pagamentoDTO.getValor()))
+                .andExpect(jsonPath("status").exists())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void updateShouldReturnNotFoundWhenIdDoesNotExist() throws Exception {
+        String jsonBody = objectMapper.writeValueAsString(pagamentoDTO);
+        mockMvc.perform(put("/pagamentos/{id}", nonExistingId)
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 }
