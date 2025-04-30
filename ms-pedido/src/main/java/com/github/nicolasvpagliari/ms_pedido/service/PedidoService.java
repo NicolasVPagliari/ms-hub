@@ -8,6 +8,7 @@ import com.github.nicolasvpagliari.ms_pedido.entities.Status;
 import com.github.nicolasvpagliari.ms_pedido.repository.ItemDoPedidoRepository;
 import com.github.nicolasvpagliari.ms_pedido.repository.PedidoRepository;
 import com.github.nicolasvpagliari.ms_pedido.service.exception.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,23 @@ public class PedidoService {
         entity = repository.save(entity);
         itemDoPedidoRepository.saveAll(entity.getItens());
         return new PedidoDTO(entity);
+    }
+
+    @Transactional
+    public PedidoDTO updatePedido(Long id, PedidoDTO pedidoDTO) {
+        try {
+            Pedido entity = repository.getReferenceById(id);
+            entity.setData(LocalDate.now());
+            entity.setStatus(Status.REALIZADO);
+            itemDoPedidoRepository.deleteByPedidoId(id);
+            copyDtoToEntity(pedidoDTO, entity);
+            entity = repository.save(entity);
+            itemDoPedidoRepository.saveAll(entity.getItens());
+            return new PedidoDTO(entity);
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Recurso não encontrado. Id: " + id);
+        }
+
     }
 
     private void copyDtoToEntity(PedidoDTO dto, Pedido entity) {
