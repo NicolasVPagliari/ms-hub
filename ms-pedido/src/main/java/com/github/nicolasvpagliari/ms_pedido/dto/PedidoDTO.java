@@ -9,12 +9,18 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class PedidoDTO {
 
     private Long id;
@@ -31,6 +37,7 @@ public class PedidoDTO {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @NotEmpty(message = "Deve ter pelo menos um item do pedido")
     private List<@Valid ItemDoPedidoDTO> itens = new ArrayList<>();
 
     public PedidoDTO(Pedido entity) {
