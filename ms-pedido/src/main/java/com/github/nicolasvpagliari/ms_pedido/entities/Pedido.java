@@ -27,6 +27,6 @@ public class Pedido {
     private Status status;
 
     //relacionamento
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<ItemDoPedido> itens = new ArrayList<>();
 }

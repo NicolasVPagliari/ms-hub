@@ -67,6 +67,15 @@ public class PedidoService {
 
     }
 
+    @Transactional
+    public void deletePedido(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Recurso mão encontrado. Id: " + id);
+        }
+
+        repository.deleteById(id);
+    }
+
     private void copyDtoToEntity(PedidoDTO dto, Pedido entity) {
 
         entity.setNome(dto.getNome());
